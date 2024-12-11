@@ -15,7 +15,7 @@ public class day8 {
         try {
             List<String> lines = Files.readAllLines(Paths.get(inputFile));
             System.out.println("Puzzle 1: " + Puzzle1(lines.toArray(new String[0])));
-            // System.out.println("Puzzle 2: " + Puzzle2(lines.toArray(new String[0])));
+            System.out.println("Puzzle 2: " + Puzzle2(lines.toArray(new String[0]))); 
         } catch (IOException e) {
             System.out.println("Error: Input file '" + inputFile + "' not found.");
         }
@@ -71,6 +71,58 @@ public class day8 {
         return antinodes;
     }
 
+ 
+
+    static int Puzzle2(String[] lines) {
+        List<String> grid = Arrays.asList(lines);
+        int n = grid.size();
+
+        Map<Character, List<Point>> antennas = new HashMap<>();
+        Set<Point> antiNodes = new HashSet<>();
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                char c = grid.get(i).charAt(j);
+                if (c != '.') {
+                    antennas.computeIfAbsent(c, k -> new ArrayList<>()).add(new Point(i, j));
+                }
+            }
+        }
+
+        for (List<Point> positions : antennas.values()) {
+            for (int i = 0; i < positions.size(); i++) {
+                for (int j = i + 1; j < positions.size(); j++) {
+                    Point pos1 = positions.get(i);
+                    Point pos2 = positions.get(j);
+
+                    int deltaRow = pos2.x - pos1.x;
+                    int deltaCol = pos2.y - pos1.y;
+
+                    int antiNode1Row = pos1.x;
+                    int antiNode1Col = pos1.y;
+
+                    while (antiNode1Row >= 0 && antiNode1Row < n && antiNode1Col >= 0 && antiNode1Col < n) {
+                        antiNodes.add(new Point(antiNode1Row, antiNode1Col));
+                        antiNode1Row -= deltaRow;
+                        antiNode1Col -= deltaCol;
+                    }
+
+                    int antiNode2Row = pos2.x;
+                    int antiNode2Col = pos2.y;
+
+                    while (antiNode2Row >= 0 && antiNode2Row < n && antiNode2Col >= 0 && antiNode2Col < n) {
+                        antiNodes.add(new Point(antiNode2Row, antiNode2Col));
+                        antiNode2Row += deltaRow;
+                        antiNode2Col += deltaCol;
+                    }
+                }
+            }
+        }
+
+        return antiNodes.size();
+    }
+
+    
     private static class Point {
         int x;
         int y;
@@ -93,4 +145,5 @@ public class day8 {
             return Objects.hash(x, y);
         }
     }
+
 }
